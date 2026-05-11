@@ -1,0 +1,105 @@
+# Import Libraries
+import nltk
+import string
+import pandas as pd
+
+from nltk.corpus import stopwords
+from nltk.stem import WordNetLemmatizer
+
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.preprocessing import LabelEncoder
+
+
+# Download required datasets
+nltk.download('stopwords')
+nltk.download('wordnet')
+
+
+# Sample Dataset
+sentences = [
+    "AI is powerful",
+    "Machine learning is future"
+]
+
+labels = ["Technology", "Technology"]
+
+
+# ------------------------------------------------
+# 1️⃣ Text Cleaning + Stopword Removal + Lemmatization
+# ------------------------------------------------
+
+stop_words = set(stopwords.words('english'))
+
+lemmatizer = WordNetLemmatizer()
+
+cleaned_sentences = []
+
+for s in sentences:
+
+    # Lowercase
+    s = s.lower()
+
+    # Remove punctuation
+    s = s.translate(
+        str.maketrans('', '', string.punctuation)
+    )
+
+    # Tokenization
+    words = s.split()
+
+    # Remove stopwords + Lemmatization
+    words = [
+        lemmatizer.lemmatize(w)
+        for w in words
+        if w not in stop_words
+    ]
+
+    cleaned_sentences.append(" ".join(words))
+
+
+print("\nCleaned Sentences:")
+print(cleaned_sentences)
+
+
+# ------------------------------------------------
+# 2️⃣ Label Encoding
+# ------------------------------------------------
+
+label_encoder = LabelEncoder()
+
+encoded_labels = label_encoder.fit_transform(labels)
+
+print("\nEncoded Labels:")
+print(encoded_labels)
+
+
+# ------------------------------------------------
+# 3️⃣ TF-IDF Representation
+# ------------------------------------------------
+
+tfidf = TfidfVectorizer()
+
+X = tfidf.fit_transform(cleaned_sentences)
+
+print("\nTF-IDF Vocabulary:")
+print(tfidf.get_feature_names_out())
+
+print("\nTF-IDF Matrix:")
+print(X.toarray())
+
+
+# ------------------------------------------------
+# 4️⃣ Save Outputs
+# ------------------------------------------------
+
+# Save TF-IDF matrix
+df = pd.DataFrame(
+    X.toarray(),
+    columns=tfidf.get_feature_names_out()
+)
+
+df['Label'] = encoded_labels
+
+df.to_csv("tfidf_output.csv", index=False)
+
+print("\nOutput saved as tfidf_output.csv")

@@ -1,0 +1,23 @@
+# Install first (run once)
+# pip install stanza
+
+import stanza
+
+# Download Hindi model
+stanza.download('hi')
+
+# Create pipeline
+nlp = stanza.Pipeline('hi')
+
+# Hindi sentence
+sentence = "राम स्कूल जाता है"
+
+# Process text
+doc = nlp(sentence)
+
+# POS Tagging
+print("\nPOS Tags:")
+
+for sent in doc.sentences:
+    for word in sent.words:
+        print(word.text, "->", word.upos)
